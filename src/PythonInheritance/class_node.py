@@ -9,7 +9,7 @@ class ClassNode:
     def get_distinct_methods(self) -> list[str]:
         base_class_methods = set()
         for base_class_node in self.base_classes.values():
-            base_class_methods.add(base_class_node.all_methods)
+            base_class_methods.update(base_class_node.all_methods)
         return [method for method in self.all_methods if method not in base_class_methods]
 
 

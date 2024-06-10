@@ -17,5 +17,17 @@ source venv/bin/activate
 python --version
 ```
 
+- Download dependencies
+``` zsh
+## Navigate to path containing "setup.py"
+pip install -e .
+```
+
+- Run unit tests
+``` zsh
+## Navigate to path containing "setup.py"
+pytest
+```
+
 
 
