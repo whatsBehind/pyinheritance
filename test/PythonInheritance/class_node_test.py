@@ -62,10 +62,22 @@ def base_class1_should_have_self_as_root_node():
     assert actual_root_nodes == expected_root_nodes, f"Expected {expected_root_nodes}, got {actual_root_nodes}"
 
 
-
 def test_class_node_should_be_printed_corrected():
     some_class_node = node_factory.init(SomeClass)
     actual_printed_str = some_class_node.__repr__()
     expected_printed_str = "PythonInheritance.class_node._ClassNode(name='class_node_test.SomeClass')"
     assert actual_printed_str == expected_printed_str, f"Expected {expected_printed_str}, got {actual_printed_str}"
-    
+
+
+def test_methods_in_some_class():
+    some_class_node = node_factory.init(SomeClass)
+    actual_methods = sorted(some_class_node.get_methods())
+    expected_methods = sorted(["hello_from_base_class_1", "hello_from_base_class_2", "hello_from_some_class"])
+    assert actual_methods == expected_methods, f"Expected {expected_methods}, got {actual_methods}"
+
+
+def test_distinct_methods_in_some_class():
+    some_class_node = node_factory.init(SomeClass)
+    actual_distinct_methods = sorted(some_class_node.get_distinct_methods())
+    expected_distinct_methods = sorted(["hello_from_some_class"])
+    assert actual_distinct_methods == expected_distinct_methods, f"Expected {expected_distinct_methods}, got {actual_distinct_methods}"

@@ -49,6 +49,8 @@ class _ClassNode:
         self._base_class_nodes: list[_ClassNode] | None = None
         self._subclass_nodes: list[_ClassNode] | None = None
         self._root_nodes: list[_ClassNode] | None = None
+        self._methods: list[str] | None = None
+        self._distinct_methods: list[str] | None = None
         self.node_factory = node_factory
 
     def get_base_class_nodes(self) -> list["_ClassNode"]:
@@ -63,14 +65,30 @@ class _ClassNode:
 
     def get_root_nodes(self) -> list["_ClassNode"]:
         if self._root_nodes is None:
-            self.get_base_class_nodes()
-            if not self._base_class_nodes:
+            if not self.get_base_class_nodes():
                 # return self if self has no base_class_nodes
                 self._root_nodes = [self]
             else:
-                self._root_nodes = [base_class_root_node for base_class_node in self._base_class_nodes for
+                self._root_nodes = [base_class_root_node for base_class_node in self.get_base_class_nodes() for
                                     base_class_root_node in base_class_node.get_root_nodes()]
         return self._root_nodes
+
+    def get_methods(self) -> list[str]:
+        if self._methods is None:
+            methods = set()
+            for attr in dir(self.cls_type):
+                if callable(getattr(self.cls_type, attr)) and not attr.startswith("__"):
+                    methods.add(attr)
+            self._methods = list(methods)
+        return self._methods
+
+    def get_distinct_methods(self) -> list[str]:
+
+        if self._distinct_methods is None:
+            base_class_methods = set(base_class_method for base_class_node in self.get_base_class_nodes() for
+                                     base_class_method in base_class_node.get_methods())
+            self_methods = set(self.get_methods())
+            return [method for method in self_methods if method not in base_class_methods]
 
     def __str__(self) -> str:
         return self.__repr__()
@@ -81,15 +99,6 @@ class _ClassNode:
 
 def get_unique_class_name(cls: type) -> str:
     return f"{cls.__module__}.{cls.__name__}"
-
-
-# def get_all_methods(cls: type) -> list[str]:
-#     public_methods = set()
-#     for attr in dir(cls):
-#         print(attr)
-#         if callable(getattr(cls, attr)) and not attr.startswith("__"):
-#             public_methods.add(attr)
-#     return list(public_methods)
 
 
 if __name__ == "__main__":
