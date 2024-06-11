@@ -1,38 +1,79 @@
-class ClassNode:
-    def __init__(self, cls: type) -> None:
-        self.cls = cls
-        self.name = get_unique_class_name(cls)
-        self.base_classes: dict[str, ClassNode] = get_base_class_nodes(cls)
-        self.all_methods: list[str] = get_all_methods(cls)
-        self.distinct_methods: list[str] = self.get_distinct_methods()
+import threading
 
-    def get_distinct_methods(self) -> list[str]:
-        base_class_methods = set()
-        for base_class_node in self.base_classes.values():
-            base_class_methods.update(base_class_node.all_methods)
-        return [method for method in self.all_methods if method not in base_class_methods]
+
+class ClassNodeFactory:
+
+    def __init__(self):
+        self._class_nodes: dict[str, "_ClassNode"] = {}
+        self._lock = threading.RLock()
+        self._blocklist: list[type] = [object]
+
+    def init(self, cls_type: type) -> "_ClassNode":
+        return self._get_or_create(cls_type)
+
+    def _get_or_create(self, cls_type: type) -> "_ClassNode":
+        with self._lock:
+            cls_name = get_unique_class_name(cls_type)
+            if cls_name not in self._class_nodes.keys():
+                class_node = _ClassNode(cls_type, self)
+                self._class_nodes[cls_name] = class_node
+
+            return self._class_nodes[cls_name]
+
+    def get_base_class_nodes(self, cls_type: type):
+        base_class_nodes = []
+        with self._lock:
+            for base_class in cls_type.__bases__:
+                if base_class in self._blocklist:
+                    continue
+                base_class_node = self._get_or_create(base_class)
+                base_class_nodes.append(base_class_node)
+            return base_class_nodes
+
+    def get_subclass_nodes(self, cls_type: type):
+        subclass_nodes = []
+        with self._lock:
+            for subclass in cls_type.__subclasses__():
+                if subclass in self._blocklist:
+                    continue
+                subclass_node = self._get_or_create(subclass)
+                subclass_nodes.append(subclass_node)
+            return subclass_nodes
+
+
+class _ClassNode:
+
+    def __init__(self, cls_type: type, node_factory: ClassNodeFactory):
+        self.name = get_unique_class_name(cls_type)
+        self.cls_type = cls_type
+        self.base_class_nodes = None
+        self.subclass_nodes = None
+        self.node_factory = node_factory
+
+    def get_base_class_nodes(self):
+        if self.base_class_nodes is None:
+            self.base_class_nodes = self.node_factory.get_base_class_nodes(self.cls_type)
+        return self.base_class_nodes
+
+    def get_subclass_nodes(self):
+        if self.subclass_nodes is None:
+            self.subclass_nodes = self.node_factory.get_subclass_nodes(self.cls_type)
+
+        return self.subclass_nodes
 
 
 def get_unique_class_name(cls: type) -> str:
     return f"{cls.__module__}.{cls.__name__}"
 
 
-def get_base_class_nodes(cls: type) -> dict[str, ClassNode]:
-    base_class_nodes = {}
-    for base_class in list(cls.__bases__):
-        base_class_node = ClassNode(base_class)
-        base_class_nodes[get_unique_class_name(base_class)] = base_class_node
-    return base_class_nodes
-
-
-def get_all_methods(cls: type) -> list[str]:
-    public_methods = set()
-    for attr in dir(cls):
-        print(attr)
-        if callable(getattr(cls, attr)) and not attr.startswith("__"):
-            public_methods.add(attr)
-    return list(public_methods)
+# def get_all_methods(cls: type) -> list[str]:
+#     public_methods = set()
+#     for attr in dir(cls):
+#         print(attr)
+#         if callable(getattr(cls, attr)) and not attr.startswith("__"):
+#             public_methods.add(attr)
+#     return list(public_methods)
 
 
 if __name__ == "__main__":
-    print(get_all_methods(ClassNode))
+    pass
