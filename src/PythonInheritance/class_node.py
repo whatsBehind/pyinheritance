@@ -46,20 +46,20 @@ class _ClassNode:
     def __init__(self, cls_type: type, node_factory: ClassNodeFactory):
         self.name = get_unique_class_name(cls_type)
         self.cls_type = cls_type
-        self.base_class_nodes = None
-        self.subclass_nodes = None
+        self._base_class_nodes = None
+        self._subclass_nodes = None
         self.node_factory = node_factory
 
     def get_base_class_nodes(self):
-        if self.base_class_nodes is None:
-            self.base_class_nodes = self.node_factory.get_base_class_nodes(self.cls_type)
-        return self.base_class_nodes
+        if self._base_class_nodes is None:
+            self._base_class_nodes = self.node_factory.get_base_class_nodes(self.cls_type)
+        return self._base_class_nodes
 
     def get_subclass_nodes(self):
-        if self.subclass_nodes is None:
-            self.subclass_nodes = self.node_factory.get_subclass_nodes(self.cls_type)
+        if self._subclass_nodes is None:
+            self._subclass_nodes = self.node_factory.get_subclass_nodes(self.cls_type)
 
-        return self.subclass_nodes
+        return self._subclass_nodes
 
 
 def get_unique_class_name(cls: type) -> str:
