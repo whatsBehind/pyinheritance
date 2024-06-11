@@ -17,7 +17,6 @@ class SomeClass(BaseClass1, BaseClass2):
 
 
 node_factory = ClassNodeFactory()
-some_class_node = node_factory.init(SomeClass)
 
 
 def test_get_unique_class_name__correct_name():
@@ -44,7 +43,29 @@ def test_some_class_should_have_correct_bases():
 
 def test_base_class1_should_have_correct_subclasses():
     base_class1_node = node_factory.init(BaseClass1)
-    actual_base_class_nodes = sorted(subclass_node.name for subclass_node in base_class1_node.get_subclass_nodes())
-    expected_base_class_nodes = sorted(["class_node_test.SomeClass"])
-    assert actual_base_class_nodes == expected_base_class_nodes, f"Expected {expected_base_class_nodes}, got {actual_base_class_nodes}"
+    actual_subclass_nodes = sorted(subclass_node.name for subclass_node in base_class1_node.get_subclass_nodes())
+    expected_subclass_nodes = sorted(["class_node_test.SomeClass"])
+    assert actual_subclass_nodes == expected_subclass_nodes, f"Expected {expected_subclass_nodes}, got {actual_subclass_nodes}"
 
+
+def test_some_class_should_have_correct_root_nodes():
+    some_class_node = node_factory.init(SomeClass)
+    actual_root_class_nodes = sorted(base_class_node.name for base_class_node in some_class_node.get_root_nodes())
+    expected_root_class_nodes = sorted(["class_node_test.BaseClass1", "class_node_test.BaseClass2"])
+    assert actual_root_class_nodes == expected_root_class_nodes, f"Expected {expected_root_class_nodes}, got {actual_root_class_nodes}"
+
+
+def base_class1_should_have_self_as_root_node():
+    base_class1_node = node_factory.init(BaseClass1)
+    actual_root_nodes = sorted(root_class_node.name for root_class_node in base_class1_node.get_subclass_nodes())
+    expected_root_nodes = sorted(["class_node_test.BaseClass1"])
+    assert actual_root_nodes == expected_root_nodes, f"Expected {expected_root_nodes}, got {actual_root_nodes}"
+
+
+
+def test_class_node_should_be_printed_corrected():
+    some_class_node = node_factory.init(SomeClass)
+    actual_printed_str = some_class_node.__repr__()
+    expected_printed_str = "PythonInheritance.class_node._ClassNode(name='class_node_test.SomeClass')"
+    assert actual_printed_str == expected_printed_str, f"Expected {expected_printed_str}, got {actual_printed_str}"
+    

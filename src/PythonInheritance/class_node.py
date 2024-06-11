@@ -46,20 +46,37 @@ class _ClassNode:
     def __init__(self, cls_type: type, node_factory: ClassNodeFactory):
         self.name = get_unique_class_name(cls_type)
         self.cls_type = cls_type
-        self._base_class_nodes = None
-        self._subclass_nodes = None
+        self._base_class_nodes: list[_ClassNode] | None = None
+        self._subclass_nodes: list[_ClassNode] | None = None
+        self._root_nodes: list[_ClassNode] | None = None
         self.node_factory = node_factory
 
-    def get_base_class_nodes(self):
+    def get_base_class_nodes(self) -> list["_ClassNode"]:
         if self._base_class_nodes is None:
             self._base_class_nodes = self.node_factory.get_base_class_nodes(self.cls_type)
         return self._base_class_nodes
 
-    def get_subclass_nodes(self):
+    def get_subclass_nodes(self) -> list["_ClassNode"]:
         if self._subclass_nodes is None:
             self._subclass_nodes = self.node_factory.get_subclass_nodes(self.cls_type)
-
         return self._subclass_nodes
+
+    def get_root_nodes(self) -> list["_ClassNode"]:
+        if self._root_nodes is None:
+            self.get_base_class_nodes()
+            if not self._base_class_nodes:
+                # return self if self has no base_class_nodes
+                self._root_nodes = [self]
+            else:
+                self._root_nodes = [base_class_root_node for base_class_node in self._base_class_nodes for
+                                    base_class_root_node in base_class_node.get_root_nodes()]
+        return self._root_nodes
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__module__}.{self.__class__.__name__}(name={self.name!r})"
 
 
 def get_unique_class_name(cls: type) -> str:
