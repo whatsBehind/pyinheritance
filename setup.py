@@ -31,7 +31,10 @@ setup(
     ],
     python_requires='>=3.10',  # Specify the Python version compatibility
     install_requires=[
-        'pytest'
+        'pytest',
+        'pygraphviz',
+        'langchain',
+        'langchain_community'
     ],
     extras_require={
         'testing': ['pytest'],

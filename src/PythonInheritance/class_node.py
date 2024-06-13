@@ -1,4 +1,5 @@
 import threading
+from graphviz import Digraph
 
 
 class ClassNodeFactory:
@@ -89,6 +90,42 @@ class _ClassNode:
                                      base_class_method in base_class_node.get_methods())
             self_methods = set(self.get_methods())
             return [method for method in self_methods if method not in base_class_methods]
+
+    def visualize_from_roots(self) -> Digraph:
+        root_nodes = self.get_root_nodes()
+
+        return self._visualize(root_nodes)
+
+    def visualize_from_self(self) -> Digraph:
+
+        return self._visualize([self])
+
+    def visualize_from_bases(self) -> Digraph:
+
+        return self._visualize(self.get_base_class_nodes())
+
+    def _visualize(self, class_nodes: list["_ClassNode"]) -> Digraph:
+        graph = Digraph()
+        visited_nodes: set[str] = set()
+
+        for root_node in class_nodes:
+            self._add_nodes_and_edges(root_node, graph, visited_nodes)
+        return graph
+
+    def _add_nodes_and_edges(self, node: "_ClassNode", graph: Digraph, visited_nodes: set[str]):
+        if node.name in visited_nodes:
+            return
+        visited_nodes.add(node.name)
+
+        # Add node with distinct methods as label
+        methods_label = "\l".join([f"+ {method}()" for method in node.get_distinct_methods()]) + "\l"
+        label = f"{{ {node.name} | ----- | {methods_label} }}"
+        graph.node(node.name, shape='record', label=label)
+
+        # Add edges to base classes
+        for subclass_node in node.get_subclass_nodes():
+            graph.edge(node.name, subclass_node.name)
+            self._add_nodes_and_edges(subclass_node, graph, visited_nodes)
 
     def __str__(self) -> str:
         return self.__repr__()
