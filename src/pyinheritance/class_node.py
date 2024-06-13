@@ -89,7 +89,8 @@ class _ClassNode:
             base_class_methods = set(base_class_method for base_class_node in self.get_base_class_nodes() for
                                      base_class_method in base_class_node.get_methods())
             self_methods = set(self.get_methods())
-            return [method for method in self_methods if method not in base_class_methods]
+            self._distinct_methods = [method for method in self_methods if method not in base_class_methods]
+        return self._distinct_methods
 
     def visualize_from_roots(self) -> Digraph:
         root_nodes = self.get_root_nodes()
