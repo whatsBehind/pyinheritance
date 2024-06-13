@@ -1,4 +1,4 @@
-from PythonInheritance.class_node import *
+from class_node import *
 from langchain_core.prompts import BasePromptTemplate
 
 node_factory = ClassNodeFactory()

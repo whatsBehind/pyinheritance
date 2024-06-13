@@ -1,4 +1,4 @@
-from PythonInheritance.class_node import ClassNodeFactory, get_unique_class_name
+from pyinheritance.class_node import get_unique_class_name, ClassNodeFactory
 
 
 class BaseClass1:
@@ -65,7 +65,7 @@ def base_class1_should_have_self_as_root_node():
 def test_class_node_should_be_printed_corrected():
     some_class_node = node_factory.init(SomeClass)
     actual_printed_str = some_class_node.__repr__()
-    expected_printed_str = "PythonInheritance.class_node._ClassNode(name='class_node_test.SomeClass')"
+    expected_printed_str = "pyinheritance.class_node._ClassNode(name='class_node_test.SomeClass')"
     assert actual_printed_str == expected_printed_str, f"Expected {expected_printed_str}, got {actual_printed_str}"
 
 
