@@ -14,14 +14,14 @@ class PyTest(test_command):
 
 
 setup(
-    name='HandyPython',  # Replace with your project name
+    name='pyinheritance',  # Replace with your project name
     version='0.1',  # Initial version
     author='puyanh',
     author_email='whatsbehind1@gmail.com',
-    description='A Python tool kit',
+    description='A Python tool to model inheritance hierarchy of Python class',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',  # For Markdown README files
-    url='https://github.com/yourusername/myproject',  # Replace with your GitHub repo URL
+    url='https://github.com/whatsBehind/pyinheritance',  # Replace with your GitHub repo URL
     packages=find_packages(where='src'),  # Look for packages in the 'src' directory
     package_dir={'': 'src'},  # Tell setuptools that packages are under 'src'
     classifiers=[
@@ -29,6 +29,7 @@ setup(
         'License :: OSI Approved :: MIT License',  # Choose an appropriate license
         'Operating System :: OS Independent',
     ],
+    license='MIT',
     python_requires='>=3.10',  # Specify the Python version compatibility
     install_requires=[
         'pytest',
